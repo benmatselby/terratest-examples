@@ -1,5 +1,7 @@
 # Terratest examples
 
+[![Build Status](https://www.travis-ci.com/benmatselby/terratest-examples.svg?branch=main)](https://www.travis-ci.com/benmatselby/terratest-examples)
+
 This repo houses code and tests as part of a set of posts about Terraform and testing.
 
 - [Terraform knowledge to get you through the day](https://dev.to/benmatselby/terraform-knowledge-to-get-you-through-the-day-17kk)
