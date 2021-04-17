@@ -11,15 +11,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Standard Go test, with the "Test" prefix and accepting the *testing.T struct.
 func TestS3Bucket(t *testing.T) {
+	// I work in eu-west-2, you may differ
 	awsRegion := "eu-west-2"
+
+	// This is using the terraform package that has a sensible retry function.
 	terraformOpts := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
+		// Our Terraform code is in the /aws folder.
 		TerraformDir: "../aws/",
 
+		// This allows us to define Terraform variables. We have a variable named
+		// "bucket_name" which essentially is a suffix. Here we are are using the
+		// random package to get a unique id we can use for testing, as bucket names
+		// have to be unique.
 		Vars: map[string]interface{}{
 			"bucket_name": fmt.Sprintf("-%v", strings.ToLower(random.UniqueId())),
 		},
 
+		// Setting the environment variables, specifically the AWS region.
 		EnvVars: map[string]string{
 			"AWS_DEFAULT_REGION": awsRegion,
 		},
