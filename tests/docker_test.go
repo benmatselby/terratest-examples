@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/docker"
+	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,19 +14,25 @@ func TestDockerImage(t *testing.T) {
 	tag := "terratest-examples:docker"
 
 	// The build options we would pass to `docker build`
-	buildOptions := &docker.BuildOptions{
-		Tags: []string{tag},
-		OtherOptions: []string{
-			"--pull",
-			"--no-cache",
-			"-f",
-			"../docker/Dockerfile",
-		},
-	}
+	// We may want to only test images already build, so let's use the
+	// `test_structure.RunTestStage` function.
+	// If you want to skip this stage, then define an environment variable:
+	// SKIP_docker_build=true
+	test_structure.RunTestStage(t, "docker_build", func() {
+		buildOptions := &docker.BuildOptions{
+			Tags: []string{tag},
+			OtherOptions: []string{
+				"--pull",
+				"--no-cache",
+				"-f",
+				"../docker/Dockerfile",
+			},
+		}
 
-	// The wrapped docker build command, with the `../docker` folder as the
-	// build context
-	docker.Build(t, "../docker", buildOptions)
+		// The wrapped docker build command, with the `../docker` folder as the
+		// build context
+		docker.Build(t, "../docker", buildOptions)
+	})
 
 	// A testing table to test different aspects of the image.
 	tt := []struct {
@@ -34,7 +41,9 @@ func TestDockerImage(t *testing.T) {
 		command    string
 		expected   string
 	}{
+		// We want to test that node 14 is installed.
 		{name: "test that node is installed", entrypoint: "node", command: "--version", expected: "14"},
+		// We want to test that the testing.txt file is in the image.
 		{name: "test that the testing.txt is present", entrypoint: "ls", command: "/tmp/testing.txt", expected: "testing.txt"},
 	}
 
